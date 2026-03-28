@@ -6,8 +6,18 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * 사용자 엔티티
+ * - loginId: 로그인 아이디 (unique)
+ * - username: 사용자명
+ * - birth: 생년월일
+ * - email: 비밀번호 찾기용
+ * - userRole: 공통코드 USER_ROLE 참조
+ * - loginType: 공통코드 LOGIN_TYPE 참조
+ */
 @Entity
 @Table(name = "users")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
@@ -20,24 +30,28 @@ public class User {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String email;
-
-    @Column
-    private String password;
+    private String loginId;             // 로그인 아이디
 
     @Column(nullable = false)
-    private String name;
+    private String username;            // 사용자명
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role = Role.USER;
-
-    @Enumerated(EnumType.STRING)
-    @Column
-    private Provider provider;
+    private LocalDate birth;            // 생년월일
 
     @Column
-    private String providerId;
+    private String password;            // 소셜 로그인은 비밀번호 없음
+
+    @Column(unique = true)
+    private String email;               // 비밀번호 찾기용
+
+    @Column(name = "user_role", nullable = false)
+    private String userRole = "USER";   // 공통코드 USER_ROLE 참조
+
+    @Column(name = "login_type", nullable = false)
+    private String loginType = "LOCAL"; // 공통코드 LOGIN_TYPE 참조
+
+    @Column
+    private String providerId;          // 소셜 로그인 고유 ID
 
     @Column(nullable = false)
     private boolean emailVerified = false;
@@ -48,12 +62,4 @@ public class User {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
-
-    public enum Role {
-        USER, ADMIN, MANAGER
-    }
-
-    public enum Provider {
-        LOCAL, GOOGLE, KAKAO
-    }
 }
